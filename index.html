@@ -1,10 +1,27 @@
 <!DOCTYPE html>
+<!--
+No BG. Copyright (C) 2026 Nathan.
+Free software under the GNU Affero General Public License, version 3. See the LICENSE file
+in the public repository, https://github.com/Fenrirak, and the Credits and Licences page (#licences).
+Uses @imgly/background-removal (AGPL-3.0) and ONNX Runtime Web (MIT), loaded unmodified.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>No BG: Free Image Background Remover</title>
 <meta name="description" content="Remove the background from any image in seconds. Free, no signup, and your images never leave your device.">
+<meta name="theme-color" content="#121212">
+<meta name="application-name" content="No BG">
+<meta name="apple-mobile-web-app-title" content="No BG">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
+<link rel="icon" href="favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="favicon-16x16.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://staticimgly.com" crossorigin>
 <style>
 :root{
   --bg:#121212; --bg2:#0c0c0c; --panel:#1a1a1a; --line:#2c2924; --text:#f3efe6; --mute:#b8b2a6;
@@ -45,6 +62,10 @@ a{color:inherit}
 .opt input{width:18px;height:18px;accent-color:var(--gold)}
 .err{color:#ff9d8f;margin:14px 0 0;min-height:1.4em;font-size:.95rem}
 
+.warm{margin:8px 0 0;color:var(--mute);font-size:.85rem;min-height:1.3em}
+#errDone{text-align:center}
+#errDone:empty{display:none}
+
 /* progress */
 .busy{padding:clamp(36px,7vw,64px) 10px;text-align:center}
 .busy h2{font-size:1.5rem}
@@ -64,7 +85,7 @@ a{color:inherit}
 .bgrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin:22px 0 4px}
 .bgrow span{color:var(--mute);font-size:.95rem;margin-right:4px}
 .sw{width:34px;height:34px;border-radius:50%;border:2px solid #5a5244;cursor:pointer;padding:0;background:#fff}
-.sw[aria-pressed=true]{border-color:var(--gold);box-shadow:0 0 0 3px #f0c27a55}
+.sw[aria-pressed=true],.sw.on{border-color:var(--gold);box-shadow:0 0 0 3px #f0c27a55}
 .sw.t{background:linear-gradient(45deg,#777 25%,#ddd 25%,#ddd 50%,#777 50%,#777 75%,#ddd 75%) 0 0/12px 12px}
 .sw.k{background:#000}
 .sw.c{background:transparent;overflow:hidden;position:relative}
@@ -93,6 +114,9 @@ footer small{color:var(--mute);font-size:.95rem}
 .doc ul{padding-left:1.2em}
 .doc .meta{color:var(--mute)}
 .doc a{color:var(--gold)}
+.doc h3{font-size:1.1rem;margin:22px 0 4px;color:var(--text)}
+.doc h3+p{margin-top:0}
+footer nav{flex-wrap:wrap;row-gap:8px}
 [hidden]{display:none!important}
 @media(max-width:620px){.panes{grid-template-columns:1fr}footer nav{gap:28px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
@@ -113,6 +137,7 @@ footer small{color:var(--mute);font-size:.95rem}
           <p class="types">PNG, JPG, JPEG, WebP, GIF, BMP, AVIF, SVG and more</p>
         </div>
         <label class="opt"><input type="checkbox" id="best" checked> Best quality (slower, cleaner edges)</label>
+        <p class="warm" id="warm"></p>
         <p class="err" id="err" role="alert"></p>
         <input id="file" type="file" hidden>
       </div>
@@ -140,6 +165,7 @@ footer small{color:var(--mute);font-size:.95rem}
           <button class="btn ghost" id="dlWebp" type="button">Download WebP</button>
           <button class="btn ghost" id="again" type="button">Remove another image</button>
         </div>
+        <p class="err" id="errDone" role="alert"></p>
       </div>
     </div>
   </section>
@@ -175,7 +201,7 @@ footer small{color:var(--mute);font-size:.95rem}
   <p>To do its work, the page downloads a small amount of code and data from other services:</p>
   <ul>
     <li>The background removal library is loaded from the jsDelivr content delivery network, with esm.sh as a backup.</li>
-    <li>The machine learning model files the library needs are downloaded from the IMG.LY content delivery network the first time you remove a background. Your browser may cache them so later visits are faster.</li>
+    <li>The machine learning model files the library needs are a sizeable download from the IMG.LY content delivery network. To make your first image faster, this starts in the background shortly after the page opens, or as soon as you begin choosing an image. The background start is skipped if your browser is set to save data or reports a slow or mobile connection; in that case the download happens when you first remove a background. Your browser may cache the files so later visits are faster.</li>
   </ul>
   <p>Like any website or file host, these services can see standard technical details of the request, such as your IP address and browser type, under their own privacy policies. They never receive your images.</p>
 
@@ -197,6 +223,30 @@ footer small{color:var(--mute);font-size:.95rem}
   <h2>Contact</h2>
   <p>Questions about this policy can be sent to <a href="mailto:Fenrirak.guy@gmail.com">Fenrirak.guy@gmail.com</a>. If you are in New Zealand, you also have rights under the Privacy Act 2020.</p>
 </article>
+<article id="licences" class="wrap doc" hidden>
+  <a href="#" class="btn ghost" style="padding:9px 22px;font-size:.95rem">Back to No BG</a>
+  <h1>Credits and Licences</h1>
+  <p class="meta">Last updated 16 October 2026</p>
+  <p>No BG is free and open source software. This page explains how it is licensed and which open source projects make it work.</p>
+
+  <h2>No BG's own code</h2>
+  <p>The code for this website is released under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">GNU Affero General Public License, version 3</a> (AGPL-3.0). You are free to use, study, change and share it, as long as anything you build from it is shared under the same licence with its source code.</p>
+  <p>The complete source code is published in a public repository on <a href="https://github.com/Fenrirak" target="_blank" rel="noopener">GitHub</a>, which also contains the full licence text in a file named LICENSE. The site is a single readable file, so you can also use your browser's view source option to see exactly what runs on your device.</p>
+
+  <h2>Open source projects used</h2>
+  <h3>Background removal library</h3>
+  <p>The removal engine is <a href="https://github.com/imgly/background-removal-js" target="_blank" rel="noopener">@imgly/background-removal</a> (version 1.5.5) by IMG.LY, licensed under the AGPL-3.0. It is loaded unmodified from the jsDelivr content delivery network, with esm.sh as a backup.</p>
+  <h3>AI model</h3>
+  <p>The neural network is a version of the ISNet model from the DIS (Dichotomous Image Segmentation) research project. The model files are supplied by IMG.LY together with the library, and their terms are listed in the library's repository.</p>
+  <h3>Model runtime</h3>
+  <p><a href="https://github.com/microsoft/onnxruntime" target="_blank" rel="noopener">ONNX Runtime Web</a> from Microsoft, licensed under the MIT licence, runs the model in your browser. It is bundled with the library above.</p>
+
+  <h2>Your images</h2>
+  <p>Images you process remain yours. They are handled only on your device, as described in the <a href="#privacy">Privacy Policy</a>.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about licensing can be sent to <a href="mailto:Fenrirak.guy@gmail.com">Fenrirak.guy@gmail.com</a>.</p>
+</article>
 </main>
 
 <footer>
@@ -204,45 +254,58 @@ footer small{color:var(--mute);font-size:.95rem}
   <nav>
     <a href="mailto:Fenrirak.guy@gmail.com">Contact</a>
     <a href="#privacy" id="privLink">Privacy Policy</a>
+    <a href="#licences">Licences</a>
   </nav>
-  <small>&copy; 2026 No BG, made in New Zealand.</small>
+  <small>&copy; 2026 No BG, made in New Zealand. Free software under the AGPL-3.0 licence.</small>
 </footer>
 
 <script>
 const $=id=>document.getElementById(id);
+const TITLE=document.title;
 const views={idle:$('vIdle'),busy:$('vBusy'),done:$('vDone')};
 const show=n=>{for(const k in views)views[k].hidden=k!==n};
-let origUrl,resBlob,resUrl,resCanvas,baseName='image',bgColor='',libP;
+const setErr=m=>{$('err').textContent=m;$('errDone').textContent=m};
+let origUrl,resBlob,resUrl,resCanvas,baseName='image',bgColor='',libP,engP=null,ready=false,attempt=0,working=false,lastP=0;
+/* start fetching the engine in the background when the page opens, so the first image is quick */
+const AUTO_WARM=true;
 
 /* page routing: home or privacy */
 function route(){
-  const p=location.hash==='#privacy';
-  $('home').hidden=p;$('privacy').hidden=!p;
-  if(p)window.scrollTo(0,0);
+  const h=location.hash,p=h==='#privacy',l=h==='#licences';
+  $('home').hidden=p||l;$('privacy').hidden=!p;$('licences').hidden=!l;
+  document.title=p?'Privacy Policy | No BG':l?'Credits and Licences | No BG':TITLE;
+  if(p||l)window.scrollTo(0,0);
+  else if(document.readyState==='complete')warm();
 }
-addEventListener('hashchange',route);route();
 
 /* picking files */
 const drop=$('drop'),file=$('file');
 $('pick').onclick=()=>file.click();
+['pointerdown','focus'].forEach(ev=>$('pick').addEventListener(ev,()=>warm(true)));
 file.onchange=()=>{if(file.files[0])handle(file.files[0]);file.value=''};
 let dc=0;
-addEventListener('dragenter',e=>{e.preventDefault();dc++;drop.classList.add('over')});
+addEventListener('dragenter',e=>{
+  e.preventDefault();dc++;drop.classList.add('over');
+  if(e.dataTransfer&&Array.from(e.dataTransfer.types||[]).includes('Files'))warm(true);
+});
 addEventListener('dragleave',()=>{dc=Math.max(0,dc-1);if(!dc)drop.classList.remove('over')});
 addEventListener('dragover',e=>e.preventDefault());
 addEventListener('drop',e=>{
   e.preventDefault();dc=0;drop.classList.remove('over');
+  if(working||!views.busy.hidden||$('home').hidden)return;
   const f=e.dataTransfer&&e.dataTransfer.files[0];
-  if(f&&views.busy.hidden&&!$('home').hidden)handle(f);
+  if(f)handle(f);
+  else if(e.dataTransfer&&e.dataTransfer.types.length)setErr('That was not a file. Save the image to your device first, then drop it here.');
 });
 addEventListener('paste',e=>{
-  if(views.idle.hidden||$('home').hidden)return;
+  if(working||!views.busy.hidden||$('home').hidden)return;
   const f=[...(e.clipboardData?.files||[])].find(f=>f.type.startsWith('image/'));
   if(f)handle(f);
 });
 
-/* decode any image at full resolution (capped only for extreme sizes) */
-const MAXPX=50e6;
+/* decode any image at full resolution (capped only for extreme sizes; iOS canvases top out near 16.7M pixels) */
+const IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const MAXPX=IOS?16e6:50e6;
 async function decodeFull(f){
   let bmp;
   try{bmp=await createImageBitmap(f,{imageOrientation:'from-image'})}catch{}
@@ -256,9 +319,10 @@ async function decodeFull(f){
   }
   let w=bmp.width||bmp.naturalWidth||1024,h=bmp.height||bmp.naturalHeight||1024;
   const k=Math.min(1,Math.sqrt(MAXPX/(w*h)));
-  w=Math.round(w*k);h=Math.round(h*k);
+  w=Math.max(1,Math.round(w*k));h=Math.max(1,Math.round(h*k));
   const c=document.createElement('canvas');c.width=w;c.height=h;
   c.getContext('2d').drawImage(bmp,0,0,w,h);
+  if(bmp.close)bmp.close();
   return c;
 }
 const toBlob=(c,t='image/png',q)=>new Promise((ok,no)=>c.toBlob(b=>b?ok(b):no(new Error('Could not encode the image')),t,q));
@@ -279,19 +343,64 @@ function flipMask(m){
 const LIBS=['https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm','https://esm.sh/@imgly/background-removal@1.5.5'];
 async function loadLib(){
   libP??=(async()=>{
-    for(const u of LIBS){try{return (await import(u)).removeBackground}catch{}}
+    for(const u of LIBS){
+      try{const m=await import(u);if(m&&typeof m.removeBackground==='function')return m}catch{}
+    }
     throw new Error('the engine could not be loaded (check your connection or ad blocker)');
   })();
   try{return await libP}catch(e){libP=null;throw e}
 }
-const prog=(base,span,lab)=>(key,cur,total)=>{
-  const p=Math.round(base+span*(total?cur/total:0));
-  if(key.startsWith('fetch'))setBusy('Loading engine','Downloading once, then it is cached for next time.',p);
-  else setBusy(lab+': removing background','Working on your device. Your image is not uploaded.',p);
+
+/* The library caches its first config (and so its first progress callback) and also caches a failed
+   download for good. So every call gets the same stable config with one dispatcher, and a retry after a
+   failure gets a new cache key through a tiny change in an unused quality value. */
+const fx={};let engFrac=0,engSink=()=>{},onProg=()=>{};
+const dispatch=(k,c,t)=>{
+  if(k.startsWith('fetch')){
+    if(!(t>0))return;
+    fx[k]=[c,t];let C=0,T=0;for(const v of Object.values(fx)){C+=v[0];T+=v[1]}
+    engFrac=Math.max(engFrac,C/T);engSink(engFrac);
+  }else if(k.startsWith('compute'))onProg(k,c,t);
 };
+const cfg=()=>({model:'isnet_fp16',output:{format:'image/x-rgba8',quality:+(0.8-attempt*1e-6).toFixed(6)},fetchArgs:{cache:'force-cache'},progress:dispatch});
+function getEngine(){
+  engP??=(async()=>{
+    const m=await loadLib();
+    if(typeof m.preload==='function')await m.preload(cfg());
+    ready=true;return m;
+  })().catch(e=>{
+    engP=null;attempt++;engFrac=0;for(const k in fx)delete fx[k];
+    throw e;
+  });
+  return engP;
+}
+
+/* background warm-up: download and start the engine while the visitor is still choosing an image */
+const warmEl=$('warm');
+function canWarm(){
+  const c=navigator.connection;
+  return !(c&&(c.saveData||c.type==='cellular'||/2g$/.test(c.effectiveType||'')));
+}
+function warm(force){
+  if(engP||(!force&&(!AUTO_WARM||!canWarm())))return;
+  let last=-1;
+  engSink=f=>{const p=Math.floor(f*100);if(p!==last){last=p;warmEl.textContent='Getting the engine ready in the background... '+p+'%'}};
+  warmEl.textContent='Getting the engine ready in the background...';
+  getEngine().then(
+    ()=>{warmEl.textContent='Engine ready. Your image will be processed straight away.'},
+    ()=>{warmEl.textContent=''}
+  );
+}
+
+const prog=(base,span,lab)=>(k,c,t)=>
+  setBusy(lab+': removing background','Working on your device. Your image is not uploaded.',Math.round(base+span*(t?c/t:0)));
+
 async function getMask(canvas,rm,onp){
-  const blob=await rm(await toBlob(canvas),{model:'isnet_fp16',output:{format:'image/x-rgba8'},progress:onp});
-  const w=+/width=\"?(\d+)/.exec(blob.type)[1],h=+/height=\"?(\d+)/.exec(blob.type)[1];
+  onProg=onp;
+  const blob=await rm(await toBlob(canvas),cfg());
+  const mw=/width="?(\d+)/.exec(blob.type),mh=/height="?(\d+)/.exec(blob.type);
+  if(!mw||!mh)throw new Error('the engine returned an unexpected result');
+  const w=+mw[1],h=+mh[1];
   const buf=new Uint8Array(await blob.arrayBuffer()),ch=buf.length/(w*h),a=new Uint8Array(w*h);
   for(let i=0;i<a.length;i++)a[i]=buf[i*ch+ch-1];
   return {a,w,h};
@@ -338,23 +447,33 @@ function buildResult(src,m){
   return out;
 }
 
+/* one job at a time */
 async function handle(f){
-  $('err').textContent='';
+  if(working)return;
+  working=true;
+  try{await run(f)}finally{working=false}
+}
+async function run(f){
+  setErr('');
   let src;
   try{src=await decodeFull(f)}catch{
-    $('err').textContent='Your browser could not read "'+f.name+'" as an image. Try a PNG, JPG, JPEG or WebP file.';return;
+    setErr('Your browser could not read "'+f.name+'" as an image. Try a PNG, JPG, JPEG or WebP file.');return;
   }
   baseName=(f.name||'image').replace(/\.[^.]+$/,'')||'image';
   if(origUrl)URL.revokeObjectURL(origUrl);
   origUrl=URL.createObjectURL(f);
-  const best=$('best').checked;
+  const best=$('best').checked,wasReady=ready;
+  lastP=0;
   show('busy');setBusy('Preparing','Loading the background removal engine.',0);
+  engSink=p=>setBusy('Loading engine','Downloading once, then it is cached for next time.',Math.round(p*40));
   try{
-    const rm=await loadLib();
-    const work=scaled(src,2048),span=best?42:88;
-    const m=await getMask(work,rm,prog(2,span,best?'Pass 1 of 2':'Working'));
+    const rm=(await getEngine()).removeBackground;
+    const base=wasReady?2:44,span=(90-base)/(best?2:1);
+    setBusy('Removing background','Working on your device. Your image is not uploaded.',base);
+    const work=scaled(src,2048);
+    const m=await getMask(work,rm,prog(base,span,best?'Pass 1 of 2':'Working'));
     if(best){
-      const m2=await getMask(flipped(work),rm,prog(46,span,'Pass 2 of 2'));
+      const m2=await getMask(flipped(work),rm,prog(base+span,span,'Pass 2 of 2'));
       flipMask(m2);
       for(let i=0;i<m.a.length;i++)m.a[i]=(m.a[i]+m2.a[i])>>1;
     }
@@ -365,7 +484,11 @@ async function handle(f){
     resBlob=await toBlob(resCanvas);
   }catch(e){
     show('idle');
-    $('err').textContent='Background removal failed: '+(e&&e.message?e.message:e)+'. Check your connection and try again.';
+    const msg=String(e&&e.message?e.message:e).replace(/\.$/,'');
+    const tail=/connection/i.test(msg)?'Please try again.'
+      :/fetch|network|load|import/i.test(msg)?'Check your connection and try again.'
+      :'Please try again, or try a smaller image.';
+    setErr('Background removal failed: '+msg+'. '+tail);
     return;
   }
   if(resUrl)URL.revokeObjectURL(resUrl);
@@ -374,17 +497,23 @@ async function handle(f){
   setBg('');show('done');
   $('tool').scrollIntoView({behavior:'smooth',block:'center'});
 }
-function setBusy(t,n,p){$('busyTitle').textContent=t;$('busyNote').textContent=n;$('barFill').style.width=p+'%'}
+function setBusy(t,n,p){
+  p=Math.max(p,lastP);lastP=p; /* the bar only ever moves forward within a job */
+  $('busyTitle').textContent=t;$('busyNote').textContent=n;$('barFill').style.width=p+'%';
+}
 
 /* background choice */
-function setBg(c){
+function setBg(c,custom=false){
   bgColor=c;
   const fr=$('resFrame');
   fr.classList.toggle('chk',!c);fr.style.background=c||'';
-  document.querySelectorAll('.sw[data-bg]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.bg===c));
+  document.querySelectorAll('.sw[data-bg]').forEach(b=>b.setAttribute('aria-pressed',String(!custom&&b.dataset.bg===c)));
+  $('swc').classList.toggle('on',custom);
 }
 document.querySelectorAll('.sw[data-bg]').forEach(b=>b.onclick=()=>setBg(b.dataset.bg));
-$('custom').oninput=e=>setBg(e.target.value);
+const cu=$('custom');
+cu.oninput=()=>setBg(cu.value,true);
+cu.onclick=()=>setBg(cu.value,true); /* picking the colour that is already showing fires no input event */
 
 /* download: full resolution, lossless PNG by default */
 function saveBlob(b,ext){
@@ -392,16 +521,31 @@ function saveBlob(b,ext){
   document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
 }
 async function save(type,ext){
-  if(!bgColor&&type==='image/png'){saveBlob(resBlob,ext);return}
-  const c=document.createElement('canvas');c.width=resCanvas.width;c.height=resCanvas.height;
-  const x=c.getContext('2d');
-  if(bgColor){x.fillStyle=bgColor;x.fillRect(0,0,c.width,c.height)}
-  x.drawImage(resCanvas,0,0);
-  saveBlob(await toBlob(c,type,1),ext);
+  try{
+    if(!bgColor&&type==='image/png'){saveBlob(resBlob,ext);return}
+    const c=document.createElement('canvas');c.width=resCanvas.width;c.height=resCanvas.height;
+    const x=c.getContext('2d');
+    if(bgColor){x.fillStyle=bgColor;x.fillRect(0,0,c.width,c.height)}
+    x.drawImage(resCanvas,0,0);
+    const b=await toBlob(c,type,1);
+    saveBlob(b,b.type===type?ext:'png'); /* browsers that cannot encode WebP hand back a PNG */
+  }catch(e){
+    setErr('Could not create the download: '+(e&&e.message?e.message:e));
+  }
 }
 $('dlPng').onclick=()=>save('image/png','png');
 $('dlWebp').onclick=()=>save('image/webp','webp');
-$('again').onclick=()=>show('idle');
+$('again').onclick=()=>{setErr('');show('idle')};
+try{if(!document.createElement('canvas').toDataURL('image/webp').startsWith('data:image/webp'))$('dlWebp').hidden=true}catch{$('dlWebp').hidden=true}
+
+/* start */
+addEventListener('hashchange',route);
+route();
+{
+  const idle=window.requestIdleCallback?f=>window.requestIdleCallback(f,{timeout:2500}):f=>setTimeout(f,800);
+  const go=()=>idle(()=>{if(!$('home').hidden)warm()});
+  if(document.readyState==='complete')go();else addEventListener('load',go);
+}
 </script>
 </body>
 </html>
