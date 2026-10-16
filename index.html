@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No BG: Free Image Background Remover</title>
+<meta name="description" content="Remove the background from any image in seconds. Free, no signup, and your images never leave your device.">
+<style>
+:root{
+  --bg:#121212; --bg2:#0c0c0c; --panel:#1a1a1a; --line:#2c2924; --text:#f3efe6; --mute:#b8b2a6;
+  --gold:#f0c27a; --gold-d:#d9a650; --ink:#1a1306;
+  --serif:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,serif;
+  --sans:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+main{flex:1}
+h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.15;margin:0}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{width:min(1080px,100% - 40px);margin:0 auto}
+
+/* hero */
+.hero{padding:clamp(48px,9vw,104px) 0 clamp(40px,6vw,72px);text-align:center}
+.hero h1{font-size:clamp(2.4rem,6.4vw,4.6rem);letter-spacing:-.01em}
+.hero .sub{color:var(--mute);font-size:clamp(1.05rem,2vw,1.3rem);margin:16px auto 0;max-width:34em}
+
+.tool{margin:clamp(28px,5vw,48px) auto 0;width:min(760px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:clamp(18px,3vw,28px)}
+.drop{border:2px dashed #4a4336;border-radius:10px;padding:clamp(36px,7vw,64px) 20px;transition:border-color .15s,background .15s;
+  background:
+    linear-gradient(45deg,#1f1f1f 25%,transparent 25%,transparent 75%,#1f1f1f 75%) 0 0/28px 28px,
+    linear-gradient(45deg,#1f1f1f 25%,transparent 25%,transparent 75%,#1f1f1f 75%) 14px 14px/28px 28px,#181818}
+.drop.over{border-color:var(--gold);background-color:#221d12}
+.btn{display:inline-block;font:600 1.05rem var(--sans);border:0;border-radius:999px;padding:14px 34px;cursor:pointer;text-decoration:none;transition:transform .12s,background .15s,border-color .15s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--gold);color:var(--ink)}
+.btn.primary:hover{background:var(--gold-d)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid #4a4336}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn.big{font-size:1.2rem;padding:17px 44px}
+.drop p{margin:16px 0 0;color:var(--mute);font-size:.98rem}
+.types{margin-top:14px!important;font-size:.88rem!important}
+.opt{display:flex;gap:8px;justify-content:center;align-items:center;margin:16px 0 0;color:var(--mute);font-size:.95rem;cursor:pointer}
+.opt input{width:18px;height:18px;accent-color:var(--gold)}
+.err{color:#ff9d8f;margin:14px 0 0;min-height:1.4em;font-size:.95rem}
+
+/* progress */
+.busy{padding:clamp(36px,7vw,64px) 10px;text-align:center}
+.busy h2{font-size:1.5rem}
+.bar{height:8px;background:#2a2a2a;border-radius:99px;overflow:hidden;margin:22px auto 10px;max-width:420px}
+.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .25s}
+.busy p{color:var(--mute);margin:0;font-size:.95rem}
+
+/* result */
+.panes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pane{margin:0}
+.pane figcaption{font-size:.95rem;color:var(--mute);margin-bottom:8px;text-align:left}
+.frame{border-radius:8px;overflow:hidden;border:1px solid var(--line);aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:#181818}
+.frame img{max-width:100%;max-height:100%;display:block;object-fit:contain}
+.frame.chk{background:
+  linear-gradient(45deg,#2b2b2b 25%,transparent 25%,transparent 75%,#2b2b2b 75%) 0 0/20px 20px,
+  linear-gradient(45deg,#2b2b2b 25%,transparent 25%,transparent 75%,#2b2b2b 75%) 10px 10px/20px 20px,#3a3a3a}
+.bgrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin:22px 0 4px}
+.bgrow span{color:var(--mute);font-size:.95rem;margin-right:4px}
+.sw{width:34px;height:34px;border-radius:50%;border:2px solid #5a5244;cursor:pointer;padding:0;background:#fff}
+.sw[aria-pressed=true]{border-color:var(--gold);box-shadow:0 0 0 3px #f0c27a55}
+.sw.t{background:linear-gradient(45deg,#777 25%,#ddd 25%,#ddd 50%,#777 50%,#777 75%,#ddd 75%) 0 0/12px 12px}
+.sw.k{background:#000}
+.sw.c{background:transparent;overflow:hidden;position:relative}
+.sw.c input{position:absolute;inset:-8px;width:60px;height:60px;border:0;padding:0;cursor:pointer;background:none}
+.acts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:22px}
+
+/* creator */
+.creator{border-top:1px solid var(--line);padding:clamp(56px,9vw,104px) 0;text-align:center}
+.creator p{font-family:var(--serif);font-size:clamp(1.15rem,2.4vw,1.45rem);line-height:1.65;max-width:30em;margin:0 auto;color:#e6e0d2}
+.links{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:34px}
+.links.support{margin-top:14px}
+
+/* footer */
+footer{background:var(--bg2);border-top:1px solid #3a3022;padding:44px 20px 38px;text-align:center}
+footer .brand{font:400 1.9rem var(--serif);color:var(--gold)}
+footer nav{display:flex;gap:40px;justify-content:center;margin:18px 0 26px}
+footer nav a{font-weight:600;font-size:1.05rem;text-decoration:none}
+footer nav a:hover{color:var(--gold)}
+footer small{color:var(--mute);font-size:.95rem}
+
+/* privacy */
+.doc{padding:clamp(36px,6vw,72px) 0 clamp(48px,8vw,96px);max-width:720px}
+.doc h1{font-size:clamp(2rem,5vw,3rem);margin:22px 0 8px}
+.doc h2{font-size:1.45rem;margin:38px 0 8px;color:var(--gold)}
+.doc p,.doc li{color:#ddd7ca;max-width:68ch}
+.doc ul{padding-left:1.2em}
+.doc .meta{color:var(--mute)}
+.doc a{color:var(--gold)}
+[hidden]{display:none!important}
+@media(max-width:620px){.panes{grid-template-columns:1fr}footer nav{gap:28px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main>
+<div id="home">
+  <section class="hero wrap">
+    <h1>Remove Image Background</h1>
+    <p class="sub">Drop in a picture and get a clean cutout in seconds. Free, with no signup.</p>
+
+    <div class="tool" id="tool">
+      <div id="vIdle">
+        <div class="drop" id="drop">
+          <button class="btn primary big" id="pick" type="button">Upload Image</button>
+          <p>or drag and drop an image here, or paste one with Ctrl+V</p>
+          <p class="types">PNG, JPG, JPEG, WebP, GIF, BMP, AVIF, SVG and more</p>
+        </div>
+        <label class="opt"><input type="checkbox" id="best" checked> Best quality (slower, cleaner edges)</label>
+        <p class="err" id="err" role="alert"></p>
+        <input id="file" type="file" hidden>
+      </div>
+
+      <div id="vBusy" class="busy" hidden>
+        <h2 id="busyTitle">Preparing</h2>
+        <div class="bar"><i id="barFill"></i></div>
+        <p id="busyNote" aria-live="polite">The first image takes a little longer while the model loads.</p>
+      </div>
+
+      <div id="vDone" hidden>
+        <div class="panes">
+          <figure class="pane"><figcaption>Original</figcaption><div class="frame"><img id="imgOrig" alt="Your original image"></div></figure>
+          <figure class="pane"><figcaption>Background removed</figcaption><div class="frame chk" id="resFrame"><img id="imgRes" alt="Your image with the background removed"></div></figure>
+        </div>
+        <div class="bgrow" role="group" aria-label="Preview background">
+          <span>Background</span>
+          <button class="sw t" data-bg="" aria-label="Transparent" aria-pressed="true" type="button"></button>
+          <button class="sw" data-bg="#ffffff" aria-label="White" aria-pressed="false" type="button"></button>
+          <button class="sw k" data-bg="#000000" aria-label="Black" aria-pressed="false" type="button"></button>
+          <label class="sw c" aria-label="Custom colour" id="swc"><input type="color" id="custom" value="#f0c27a"></label>
+        </div>
+        <div class="acts">
+          <button class="btn primary" id="dlPng" type="button">Download PNG</button>
+          <button class="btn ghost" id="dlWebp" type="button">Download WebP</button>
+          <button class="btn ghost" id="again" type="button">Remove another image</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="creator">
+    <div class="wrap">
+      <p>Hi there, I'm Nathan. I built No BG as part of an ongoing project to make good quality websites that are completely free for everyone to use. If you enjoy it, I would love for you to take a look at my other creations below.</p>
+      <div class="links">
+        <a class="btn ghost" href="https://legend-of-fenrirak.com" target="_blank" rel="noopener">Legend of Fenrirak</a>
+        <a class="btn ghost" href="https://fenrirak.github.io/The-29-World/index.html" target="_blank" rel="noopener">The 29 World</a>
+        <a class="btn ghost" href="https://fenrirak.github.io/Moonlit-Lantern/" target="_blank" rel="noopener">Moonlit Lantern</a>
+      </div>
+      <div class="links support">
+        <a class="btn primary" href="https://buymeacoffee.com/29world" target="_blank" rel="noopener">Support the Creator</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<article id="privacy" class="wrap doc" hidden>
+  <a href="#" class="btn ghost" style="padding:9px 22px;font-size:.95rem">Back to No BG</a>
+  <h1>Privacy Policy</h1>
+  <p class="meta">Last updated 16 October 2026</p>
+  <p>No BG is a free tool that removes the background from images. This policy explains, in plain terms, what happens to your data when you use it. The short version: your images stay on your device.</p>
+
+  <h2>Your images are not uploaded</h2>
+  <p>All background removal runs inside your own browser using WebAssembly. When you choose, drop or paste an image, it is read locally, processed on your device and shown back to you. It is never sent to our servers or to any third party, and we have no way to see it. Closing or refreshing the page discards your images and results.</p>
+
+  <h2>What we collect</h2>
+  <p>We do not collect personal information. There are no accounts or logins, no forms that ask for your details, no cookies, no analytics or advertising trackers, and the site does not store anything in your browser's local storage.</p>
+
+  <h2>Third-party files the page loads</h2>
+  <p>To do its work, the page downloads a small amount of code and data from other services:</p>
+  <ul>
+    <li>The background removal library is loaded from the jsDelivr content delivery network, with esm.sh as a backup.</li>
+    <li>The machine learning model files the library needs are downloaded from the IMG.LY content delivery network the first time you remove a background. Your browser may cache them so later visits are faster.</li>
+  </ul>
+  <p>Like any website or file host, these services can see standard technical details of the request, such as your IP address and browser type, under their own privacy policies. They never receive your images.</p>
+
+  <h2>Hosting</h2>
+  <p>This site is served as static files by its hosting provider. The host may keep ordinary server logs (for example IP addresses and request times) for security and reliability. We do not use these logs to identify or track visitors.</p>
+
+  <h2>External links</h2>
+  <p>The links to our other websites and to Buy Me a Coffee lead to separate sites with their own privacy practices. Nothing is shared with them unless you choose to follow a link and act there.</p>
+
+  <h2>Downloads</h2>
+  <p>When you download a result, the file is created in your browser and saved straight to your device. Please make sure you have the right to edit any image you use.</p>
+
+  <h2>Children</h2>
+  <p>No BG collects no personal data from anyone, including children.</p>
+
+  <h2>Changes</h2>
+  <p>If the way the site works changes in a way that affects your privacy, this page will be updated and the date above will change.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy can be sent to <a href="mailto:Fenrirak.guy@gmail.com">Fenrirak.guy@gmail.com</a>. If you are in New Zealand, you also have rights under the Privacy Act 2020.</p>
+</article>
+</main>
+
+<footer>
+  <div class="brand">No BG&trade;</div>
+  <nav>
+    <a href="mailto:Fenrirak.guy@gmail.com">Contact</a>
+    <a href="#privacy" id="privLink">Privacy Policy</a>
+  </nav>
+  <small>&copy; 2026 No BG, made in New Zealand.</small>
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const views={idle:$('vIdle'),busy:$('vBusy'),done:$('vDone')};
+const show=n=>{for(const k in views)views[k].hidden=k!==n};
+let origUrl,resBlob,resUrl,resCanvas,baseName='image',bgColor='',libP;
+
+/* page routing: home or privacy */
+function route(){
+  const p=location.hash==='#privacy';
+  $('home').hidden=p;$('privacy').hidden=!p;
+  if(p)window.scrollTo(0,0);
+}
+addEventListener('hashchange',route);route();
+
+/* picking files */
+const drop=$('drop'),file=$('file');
+$('pick').onclick=()=>file.click();
+file.onchange=()=>{if(file.files[0])handle(file.files[0]);file.value=''};
+let dc=0;
+addEventListener('dragenter',e=>{e.preventDefault();dc++;drop.classList.add('over')});
+addEventListener('dragleave',()=>{dc=Math.max(0,dc-1);if(!dc)drop.classList.remove('over')});
+addEventListener('dragover',e=>e.preventDefault());
+addEventListener('drop',e=>{
+  e.preventDefault();dc=0;drop.classList.remove('over');
+  const f=e.dataTransfer&&e.dataTransfer.files[0];
+  if(f&&views.busy.hidden&&!$('home').hidden)handle(f);
+});
+addEventListener('paste',e=>{
+  if(views.idle.hidden||$('home').hidden)return;
+  const f=[...(e.clipboardData?.files||[])].find(f=>f.type.startsWith('image/'));
+  if(f)handle(f);
+});
+
+/* decode any image at full resolution (capped only for extreme sizes) */
+const MAXPX=50e6;
+async function decodeFull(f){
+  let bmp;
+  try{bmp=await createImageBitmap(f,{imageOrientation:'from-image'})}catch{}
+  if(!bmp){
+    bmp=await new Promise((ok,no)=>{
+      const u=URL.createObjectURL(f),i=new Image();
+      i.onload=()=>{URL.revokeObjectURL(u);ok(i)};
+      i.onerror=()=>{URL.revokeObjectURL(u);no(new Error('decode'))};
+      i.src=u;
+    });
+  }
+  let w=bmp.width||bmp.naturalWidth||1024,h=bmp.height||bmp.naturalHeight||1024;
+  const k=Math.min(1,Math.sqrt(MAXPX/(w*h)));
+  w=Math.round(w*k);h=Math.round(h*k);
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  c.getContext('2d').drawImage(bmp,0,0,w,h);
+  return c;
+}
+const toBlob=(c,t='image/png',q)=>new Promise((ok,no)=>c.toBlob(b=>b?ok(b):no(new Error('Could not encode the image')),t,q));
+function scaled(c,max){
+  const k=Math.min(1,max/Math.max(c.width,c.height));if(k===1)return c;
+  const o=document.createElement('canvas');o.width=Math.round(c.width*k);o.height=Math.round(c.height*k);
+  const x=o.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(c,0,0,o.width,o.height);return o;
+}
+function flipped(c){
+  const o=document.createElement('canvas');o.width=c.width;o.height=c.height;
+  const x=o.getContext('2d');x.translate(c.width,0);x.scale(-1,1);x.drawImage(c,0,0);return o;
+}
+function flipMask(m){
+  for(let y=0;y<m.h;y++){let l=y*m.w,r=l+m.w-1;while(l<r){const t=m.a[l];m.a[l]=m.a[r];m.a[r--]=t;l++}}
+}
+
+/* engine */
+const LIBS=['https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm','https://esm.sh/@imgly/background-removal@1.5.5'];
+async function loadLib(){
+  libP??=(async()=>{
+    for(const u of LIBS){try{return (await import(u)).removeBackground}catch{}}
+    throw new Error('the engine could not be loaded (check your connection or ad blocker)');
+  })();
+  try{return await libP}catch(e){libP=null;throw e}
+}
+const prog=(base,span,lab)=>(key,cur,total)=>{
+  const p=Math.round(base+span*(total?cur/total:0));
+  if(key.startsWith('fetch'))setBusy('Loading engine','Downloading once, then it is cached for next time.',p);
+  else setBusy(lab+': removing background','Working on your device. Your image is not uploaded.',p);
+};
+async function getMask(canvas,rm,onp){
+  const blob=await rm(await toBlob(canvas),{model:'isnet_fp16',output:{format:'image/x-rgba8'},progress:onp});
+  const w=+/width=\"?(\d+)/.exec(blob.type)[1],h=+/height=\"?(\d+)/.exec(blob.type)[1];
+  const buf=new Uint8Array(await blob.arrayBuffer()),ch=buf.length/(w*h),a=new Uint8Array(w*h);
+  for(let i=0;i<a.length;i++)a[i]=buf[i*ch+ch-1];
+  return {a,w,h};
+}
+
+/* edge refinement: tighten the matte, drop specks, fill tiny holes */
+function label(a,w,h,pred){
+  const n=w*h,id=new Int32Array(n),st=new Int32Array(n),sz=[0],bd=[false];let k=0;
+  for(let s=0;s<n;s++){
+    if(id[s]||!pred(a[s]))continue;
+    k++;let top=0,size=0,b=false;st[top++]=s;id[s]=k;
+    while(top){
+      const p=st[--top];size++;const x=p%w,y=(p/w)|0;
+      if(x===0||y===0||x===w-1||y===h-1)b=true;
+      if(x>0&&!id[p-1]&&pred(a[p-1])){id[p-1]=k;st[top++]=p-1}
+      if(x<w-1&&!id[p+1]&&pred(a[p+1])){id[p+1]=k;st[top++]=p+1}
+      if(y>0&&!id[p-w]&&pred(a[p-w])){id[p-w]=k;st[top++]=p-w}
+      if(y<h-1&&!id[p+w]&&pred(a[p+w])){id[p+w]=k;st[top++]=p+w}
+    }
+    sz.push(size);bd.push(b);
+  }
+  return {id,sz,bd};
+}
+function refine(a,w,h){
+  const n=w*h,min=Math.max(30,n*0.0003);
+  for(let i=0;i<n;i++){let t=(a[i]/255-.1)/.8;t=t<0?0:t>1?1:t;a[i]=t*t*(3-2*t)*255}
+  let L=label(a,w,h,v=>v>16),big=0;
+  for(const s of L.sz)if(s>big)big=s;
+  for(let i=0;i<n;i++){const c=L.id[i];if(c&&L.sz[c]<min&&L.sz[c]!==big)a[i]=0}
+  L=label(a,w,h,v=>v<16);
+  for(let i=0;i<n;i++){const c=L.id[i];if(c&&!L.bd[c]&&L.sz[c]<min)a[i]=255}
+}
+
+/* apply the mask to the full resolution original */
+function buildResult(src,m){
+  const mc=document.createElement('canvas');mc.width=m.w;mc.height=m.h;
+  const mx=mc.getContext('2d'),d=mx.createImageData(m.w,m.h);
+  for(let i=0;i<m.a.length;i++)d.data[i*4+3]=m.a[i];
+  mx.putImageData(d,0,0);
+  const out=document.createElement('canvas');out.width=src.width;out.height=src.height;
+  const x=out.getContext('2d');x.drawImage(src,0,0);
+  x.globalCompositeOperation='destination-in';x.imageSmoothingQuality='high';
+  x.drawImage(mc,0,0,out.width,out.height);
+  return out;
+}
+
+async function handle(f){
+  $('err').textContent='';
+  let src;
+  try{src=await decodeFull(f)}catch{
+    $('err').textContent='Your browser could not read "'+f.name+'" as an image. Try a PNG, JPG, JPEG or WebP file.';return;
+  }
+  baseName=(f.name||'image').replace(/\.[^.]+$/,'')||'image';
+  if(origUrl)URL.revokeObjectURL(origUrl);
+  origUrl=URL.createObjectURL(f);
+  const best=$('best').checked;
+  show('busy');setBusy('Preparing','Loading the background removal engine.',0);
+  try{
+    const rm=await loadLib();
+    const work=scaled(src,2048),span=best?42:88;
+    const m=await getMask(work,rm,prog(2,span,best?'Pass 1 of 2':'Working'));
+    if(best){
+      const m2=await getMask(flipped(work),rm,prog(46,span,'Pass 2 of 2'));
+      flipMask(m2);
+      for(let i=0;i<m.a.length;i++)m.a[i]=(m.a[i]+m2.a[i])>>1;
+    }
+    setBusy('Refining edges','Cleaning up the cutout at full resolution.',92);
+    await new Promise(r=>setTimeout(r,30));
+    refine(m.a,m.w,m.h);
+    resCanvas=buildResult(src,m);
+    resBlob=await toBlob(resCanvas);
+  }catch(e){
+    show('idle');
+    $('err').textContent='Background removal failed: '+(e&&e.message?e.message:e)+'. Check your connection and try again.';
+    return;
+  }
+  if(resUrl)URL.revokeObjectURL(resUrl);
+  resUrl=URL.createObjectURL(resBlob);
+  $('imgOrig').src=origUrl;$('imgRes').src=resUrl;
+  setBg('');show('done');
+  $('tool').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function setBusy(t,n,p){$('busyTitle').textContent=t;$('busyNote').textContent=n;$('barFill').style.width=p+'%'}
+
+/* background choice */
+function setBg(c){
+  bgColor=c;
+  const fr=$('resFrame');
+  fr.classList.toggle('chk',!c);fr.style.background=c||'';
+  document.querySelectorAll('.sw[data-bg]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.bg===c));
+}
+document.querySelectorAll('.sw[data-bg]').forEach(b=>b.onclick=()=>setBg(b.dataset.bg));
+$('custom').oninput=e=>setBg(e.target.value);
+
+/* download: full resolution, lossless PNG by default */
+function saveBlob(b,ext){
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=baseName+'-no-bg.'+ext;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+async function save(type,ext){
+  if(!bgColor&&type==='image/png'){saveBlob(resBlob,ext);return}
+  const c=document.createElement('canvas');c.width=resCanvas.width;c.height=resCanvas.height;
+  const x=c.getContext('2d');
+  if(bgColor){x.fillStyle=bgColor;x.fillRect(0,0,c.width,c.height)}
+  x.drawImage(resCanvas,0,0);
+  saveBlob(await toBlob(c,type,1),ext);
+}
+$('dlPng').onclick=()=>save('image/png','png');
+$('dlWebp').onclick=()=>save('image/webp','webp');
+$('again').onclick=()=>show('idle');
+</script>
+</body>
+</html>
