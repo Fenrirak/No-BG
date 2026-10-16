@@ -14,6 +14,9 @@ Uses @imgly/background-removal (AGPL-3.0) and ONNX Runtime Web (MIT), loaded unm
 <meta name="theme-color" content="#121212">
 <meta name="application-name" content="No BG">
 <meta name="apple-mobile-web-app-title" content="No BG">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
 <link rel="icon" href="favicon-32x32.png" type="image/png" sizes="32x32">
@@ -38,9 +41,16 @@ a{color:inherit}
 :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .wrap{width:min(1080px,100% - 40px);margin:0 auto}
 
+/* brand */
+.brand-top{display:inline-flex;align-items:center;gap:14px;text-decoration:none;color:var(--text);margin-bottom:clamp(20px,4vw,32px)}
+.brand-top svg{width:46px;height:46px;display:block;flex:none}
+.brand-top b{font:400 clamp(2rem,4.6vw,2.6rem)/1 var(--serif);letter-spacing:.01em}
+.brand-top b em{font-style:normal;color:var(--gold)}
+
 /* hero */
-.hero{padding:clamp(48px,9vw,104px) 0 clamp(40px,6vw,72px);text-align:center}
+.hero{padding:clamp(36px,6vw,68px) 0 clamp(40px,6vw,72px);text-align:center}
 .hero h1{font-size:clamp(2.4rem,6.4vw,4.6rem);letter-spacing:-.01em}
+.hero .sub strong{color:var(--text);font-weight:600}
 .hero .sub{color:var(--mute);font-size:clamp(1.05rem,2vw,1.3rem);margin:16px auto 0;max-width:34em}
 
 .tool{margin:clamp(28px,5vw,48px) auto 0;width:min(760px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:clamp(18px,3vw,28px)}
@@ -62,7 +72,9 @@ a{color:inherit}
 .opt input{width:18px;height:18px;accent-color:var(--gold)}
 .err{color:#ff9d8f;margin:14px 0 0;min-height:1.4em;font-size:.95rem}
 
-.warm{margin:8px 0 0;color:var(--mute);font-size:.85rem;min-height:1.3em}
+.warm{margin:12px auto 0;color:var(--mute);font-size:.88rem;line-height:1.5;max-width:34em;text-align:center}
+.warm:empty{display:none}
+.tool{scroll-margin-top:16px}
 #errDone{text-align:center}
 #errDone:empty{display:none}
 
@@ -72,6 +84,30 @@ a{color:inherit}
 .bar{height:8px;background:#2a2a2a;border-radius:99px;overflow:hidden;margin:22px auto 10px;max-width:420px}
 .bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .25s}
 .busy p{color:var(--mute);margin:0;font-size:.95rem}
+
+/* batch */
+.bhead{text-align:center;padding:6px 0 18px}
+.bhead h2{font-size:1.5rem}
+.bhead .bar{margin:16px auto 10px}
+.bhead p+p{margin-top:4px}
+.bhead p{margin:0 auto;color:var(--mute);font-size:.95rem;max-width:36em}
+.bhead .warn{color:#f3c987;margin-top:8px}
+.bhead .btn{margin-top:14px}
+.btn.sm{font-size:.88rem;padding:8px 18px}
+.btn[disabled]{opacity:.55;cursor:default}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.cell{background:#151515;border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.cell .frame{aspect-ratio:1/1;position:relative;color:var(--mute);font-size:1.4rem}
+.cell .nm{font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell .st{font-size:.8rem;color:var(--mute);min-height:2.4em;line-height:1.2}
+.cell.fail .st{color:#ff9d8f}
+.cell.done .st{color:var(--gold)}
+.cell .btn{width:100%;padding:7px 10px}
+.spin{width:26px;height:26px;border-radius:50%;border:3px solid #3a352b;border-top-color:var(--gold);animation:sp .9s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.bctl{margin-top:20px}
+.bctl .fmt{display:flex;gap:8px;align-items:center;justify-content:center;margin:14px 0 0;color:var(--mute);font-size:.95rem}
+.bctl select{background:#222;color:var(--text);border:1px solid #4a4336;border-radius:8px;padding:6px 10px;font:inherit}
 
 /* result */
 .panes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -119,33 +155,47 @@ footer small{color:var(--mute);font-size:.95rem}
 footer nav{flex-wrap:wrap;row-gap:8px}
 [hidden]{display:none!important}
 @media(max-width:620px){.panes{grid-template-columns:1fr}footer nav{gap:28px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 <main>
 <div id="home">
   <section class="hero wrap">
+    <a class="brand-top" href="#" aria-label="No BG">
+      <svg viewBox="0 0 512 512" aria-hidden="true">
+        <defs><clipPath id="lc"><rect width="512" height="512" rx="120"/></clipPath></defs>
+        <g clip-path="url(#lc)">
+          <rect width="512" height="512" fill="#211e18"/>
+          <path d="M0 0h128v128H0zM256 0h128v128H256zM128 128h128v128H128zM384 128h128v128H384zM0 256h128v128H0zM256 256h128v128H256zM128 384h128v128H128zM384 384h128v128H384z" fill="#2e2921"/>
+          <circle cx="256" cy="196" r="96" fill="#f0c27a"/>
+          <path d="M70 512C70 372 150 304 256 304C362 304 442 372 442 512Z" fill="#f0c27a"/>
+        </g>
+      </svg>
+      <b>No <em>BG</em></b>
+    </a>
     <h1>Remove Image Background</h1>
-    <p class="sub">Drop in a picture and get a clean cutout in seconds. Free, with no signup.</p>
+    <p class="sub">Drop in a picture and get a clean cutout in seconds. Got a lot? Do up to <strong>30 images at once</strong>. Free, with no signup.</p>
 
     <div class="tool" id="tool">
       <div id="vIdle">
         <div class="drop" id="drop">
-          <button class="btn primary big" id="pick" type="button">Upload Image</button>
-          <p>or drag and drop an image here, or paste one with Ctrl+V</p>
-          <p class="types">PNG, JPG, JPEG, WebP, GIF, BMP, AVIF, SVG and more</p>
+          <button class="btn primary big" id="pick" type="button">Upload Images</button>
+          <p>or drag and drop images here, or paste one with Ctrl+V</p>
+          <p class="types">Choose up to 30 images at once</p>
+          <p class="types" style="margin-top:6px!important">PNG, JPG, JPEG, WebP, GIF, BMP, AVIF, SVG and more</p>
         </div>
         <label class="opt"><input type="checkbox" id="best" checked> Best quality (slower, cleaner edges)</label>
-        <p class="warm" id="warm"></p>
+        <label class="opt"><input type="checkbox" id="clean" checked> Remove thin leftover outlines (turn off for fine hair or fur)</label>
+        <p class="warm" id="warm">First time only: the tool loads inside this web page, so your first image takes a little longer. Nothing is installed or saved on your computer.</p>
         <p class="err" id="err" role="alert"></p>
-        <input id="file" type="file" hidden>
+        <input id="file" type="file" accept="image/*" multiple hidden>
       </div>
 
       <div id="vBusy" class="busy" hidden>
         <h2 id="busyTitle">Preparing</h2>
         <div class="bar"><i id="barFill"></i></div>
-        <p id="busyNote" aria-live="polite">The first image takes a little longer while the model loads.</p>
+        <p id="busyNote" aria-live="polite">Getting ready. The first image takes a little longer because the tool loads inside this web page.</p>
       </div>
 
       <div id="vDone" hidden>
@@ -153,19 +203,41 @@ footer nav{flex-wrap:wrap;row-gap:8px}
           <figure class="pane"><figcaption>Original</figcaption><div class="frame"><img id="imgOrig" alt="Your original image"></div></figure>
           <figure class="pane"><figcaption>Background removed</figcaption><div class="frame chk" id="resFrame"><img id="imgRes" alt="Your image with the background removed"></div></figure>
         </div>
-        <div class="bgrow" role="group" aria-label="Preview background">
+        <div id="slotDone">
+<div class="bgrow" id="bgrow" role="group" aria-label="Preview background">
           <span>Background</span>
           <button class="sw t" data-bg="" aria-label="Transparent" aria-pressed="true" type="button"></button>
           <button class="sw" data-bg="#ffffff" aria-label="White" aria-pressed="false" type="button"></button>
           <button class="sw k" data-bg="#000000" aria-label="Black" aria-pressed="false" type="button"></button>
           <label class="sw c" aria-label="Custom colour" id="swc"><input type="color" id="custom" value="#f0c27a"></label>
         </div>
+        </div>
         <div class="acts">
           <button class="btn primary" id="dlPng" type="button">Download PNG</button>
           <button class="btn ghost" id="dlWebp" type="button">Download WebP</button>
-          <button class="btn ghost" id="again" type="button">Remove another image</button>
+          <button class="btn ghost" id="again" type="button">Remove more images</button>
         </div>
         <p class="err" id="errDone" role="alert"></p>
+      </div>
+      <div id="vBatch" hidden>
+        <div class="bhead">
+          <h2 id="bTitle">Removing backgrounds</h2>
+          <div class="bar" id="bBar"><i id="bFill"></i></div>
+          <p id="bNote" aria-live="polite"></p>
+          <p id="bPriv"></p>
+          <p class="warn" id="bWarn" hidden></p>
+          <button class="btn ghost sm" id="bStop" type="button">Stop after this image</button>
+        </div>
+        <div class="grid" id="grid"></div>
+        <div class="bctl" id="bCtl" hidden>
+          <div id="slotBatch"></div>
+          <label class="fmt">Save as <select id="bFmt"><option value="image/png">PNG</option><option value="image/webp">WebP</option></select></label>
+          <div class="acts">
+            <button class="btn primary" id="bZip" type="button">Download all (ZIP)</button>
+            <button class="btn ghost" id="bAgain" type="button">Start over</button>
+          </div>
+        </div>
+        <p class="err" id="errBatch" role="alert" style="text-align:center"></p>
       </div>
     </div>
   </section>
@@ -250,7 +322,7 @@ footer nav{flex-wrap:wrap;row-gap:8px}
 </main>
 
 <footer>
-  <div class="brand">No BG&trade;</div>
+  <div class="brand">No BG</div>
   <nav>
     <a href="mailto:Fenrirak.guy@gmail.com">Contact</a>
     <a href="#privacy" id="privLink">Privacy Policy</a>
@@ -262,9 +334,23 @@ footer nav{flex-wrap:wrap;row-gap:8px}
 <script>
 const $=id=>document.getElementById(id);
 const TITLE=document.title;
-const views={idle:$('vIdle'),busy:$('vBusy'),done:$('vDone')};
-const show=n=>{for(const k in views)views[k].hidden=k!==n};
-const setErr=m=>{$('err').textContent=m;$('errDone').textContent=m};
+const views={idle:$('vIdle'),busy:$('vBusy'),done:$('vDone'),batch:$('vBatch')};
+const show=n=>{
+  for(const k in views)views[k].hidden=k!==n;
+  if(n==='done')$('slotDone').append($('bgrow'));
+  if(n==='batch')$('slotBatch').append($('bgrow'));
+};
+const setErr=m=>{$('err').textContent=m;$('errDone').textContent=m;$('errBatch').textContent=m};
+const FIRST_NOTE='First time only: the tool loads inside this web page, so your first image takes a little longer. Nothing is installed or saved on your computer.';
+const LOAD_NOTE='This only happens the first time, and it is the only slow part. The tool is simply loading inside this web page. Nothing is installed or saved to your computer, and your browser may keep a temporary copy so later visits are quicker.';
+const PRIV='This happens inside your browser, so your image never leaves your device.';
+function errInfo(e){
+  const m=String(e&&e.message?e.message:e);
+  if(e&&e.kind==='load')return{short:'Tool could not load',full:'The background remover could not load. Check your internet connection, turn off any ad blocker for this site, then try again.'};
+  if(/memory|allocat|array buffer|too large/i.test(m))return{short:'Image too large for your device',full:'This image is too big for your device to handle. Try a smaller version of it.'};
+  if(/fetch|network|failed to load|import|download/i.test(m))return{short:'Download problem',full:'The tool could not finish loading its files. Check your internet connection and try again.'};
+  return{short:'Could not process this image',full:'Something went wrong while removing the background from this image. Please try again, or try a smaller image.'};
+}
 let origUrl,resBlob,resUrl,resCanvas,baseName='image',bgColor='',libP,engP=null,ready=false,attempt=0,working=false,lastP=0;
 /* start fetching the engine in the background when the page opens, so the first image is quick */
 const AUTO_WARM=true;
@@ -282,7 +368,7 @@ function route(){
 const drop=$('drop'),file=$('file');
 $('pick').onclick=()=>file.click();
 ['pointerdown','focus'].forEach(ev=>$('pick').addEventListener(ev,()=>warm(true)));
-file.onchange=()=>{if(file.files[0])handle(file.files[0]);file.value=''};
+file.onchange=()=>{const fl=[...file.files];file.value='';if(fl.length)handleFiles(fl)};
 let dc=0;
 addEventListener('dragenter',e=>{
   e.preventDefault();dc++;drop.classList.add('over');
@@ -293,14 +379,14 @@ addEventListener('dragover',e=>e.preventDefault());
 addEventListener('drop',e=>{
   e.preventDefault();dc=0;drop.classList.remove('over');
   if(working||!views.busy.hidden||$('home').hidden)return;
-  const f=e.dataTransfer&&e.dataTransfer.files[0];
-  if(f)handle(f);
+  const fl=e.dataTransfer?[...e.dataTransfer.files]:[];
+  if(fl.length)handleFiles(fl);
   else if(e.dataTransfer&&e.dataTransfer.types.length)setErr('That was not a file. Save the image to your device first, then drop it here.');
 });
 addEventListener('paste',e=>{
   if(working||!views.busy.hidden||$('home').hidden)return;
-  const f=[...(e.clipboardData?.files||[])].find(f=>f.type.startsWith('image/'));
-  if(f)handle(f);
+  const fl=[...(e.clipboardData?.files||[])].filter(f=>f.type.startsWith('image/'));
+  if(fl.length)handleFiles(fl);
 });
 
 /* decode any image at full resolution (capped only for extreme sizes; iOS canvases top out near 16.7M pixels) */
@@ -346,7 +432,7 @@ async function loadLib(){
     for(const u of LIBS){
       try{const m=await import(u);if(m&&typeof m.removeBackground==='function')return m}catch{}
     }
-    throw new Error('the engine could not be loaded (check your connection or ad blocker)');
+    throw Object.assign(new Error('engine could not be loaded'),{kind:'load'});
   })();
   try{return await libP}catch(e){libP=null;throw e}
 }
@@ -384,16 +470,36 @@ function canWarm(){
 function warm(force){
   if(engP||(!force&&(!AUTO_WARM||!canWarm())))return;
   let last=-1;
-  engSink=f=>{const p=Math.floor(f*100);if(p!==last){last=p;warmEl.textContent='Getting the engine ready in the background... '+p+'%'}};
-  warmEl.textContent='Getting the engine ready in the background...';
+  engSink=f=>{const p=Math.floor(f*100);if(p!==last){last=p;warmEl.textContent='Loading the tool inside this page (first time only): '+p+'%. Nothing is installed or saved on your computer.'}};
+  warmEl.textContent='Loading the tool inside this page (first time only). Nothing is installed or saved on your computer.';
   getEngine().then(
-    ()=>{warmEl.textContent='Engine ready. Your image will be processed straight away.'},
-    ()=>{warmEl.textContent=''}
+    ()=>{warmEl.textContent='The tool is ready. Your images will be processed straight away.'},
+    ()=>{warmEl.textContent=FIRST_NOTE}
   );
 }
 
-const prog=(base,span,lab)=>(k,c,t)=>
-  setBusy(lab+': removing background','Working on your device. Your image is not uploaded.',Math.round(base+span*(t?c/t:0)));
+async function cutout(src,rm,best,report,base,clean){
+  const span=(90-base)/(best?2:1),step=n=>best?' (step '+n+' of 2)':'';
+  const mk=(b,n)=>(k,c,t)=>report('Removing the background','Finding the edges of your subject'+step(n)+'. '+PRIV,Math.round(b+span*(t?c/t:0)));
+  report('Removing the background','Finding the edges of your subject'+step(1)+'. '+PRIV,base);
+  const work=scaled(src,2048);
+  const m=await getMask(work,rm,mk(base,1));
+  if(best){
+    const m2=await getMask(flipped(work),rm,mk(base+span,2));
+    flipMask(m2);
+    for(let i=0;i<m.a.length;i++)m.a[i]=(m.a[i]+m2.a[i])>>1;
+  }
+  report('Polishing the edges','Cleaning up the cutout at full size. Almost done.',92);
+  await new Promise(r=>setTimeout(r,30));
+  refine(m.a,m.w,m.h);
+  let F=null;
+  if(clean){
+    report('Polishing the edges','Removing any thin leftover outline around your subject.',95);
+    tighten(m.a,m.w,m.h);
+    if(work.width===m.w&&work.height===m.h)F=edgeFill(work.getContext('2d').getImageData(0,0,m.w,m.h).data,m.a,m.w,m.h);
+  }
+  return buildResult(src,m,F);
+}
 
 async function getMask(canvas,rm,onp){
   onProg=onp;
@@ -434,8 +540,51 @@ function refine(a,w,h){
   for(let i=0;i<n;i++){const c=L.id[i];if(c&&!L.bd[c]&&L.sz[c]<min)a[i]=255}
 }
 
+/* outline cleanup. Models often leave a faint rim of background just outside the subject.
+   1) pull the matte in by a pixel or two, soften it, and sharpen the curve so the rim goes transparent;
+   2) on the semi-transparent pixels that remain, swap any leftover background colour for the nearest solid colour of the subject. */
+function tighten(a,w,h){
+  const n=w*h,r=Math.max(w,h)>1800?2:1,t=new Uint8Array(n),cl=(v,m)=>v<0?0:v>=m?m-1:v;
+  for(let y=0;y<h;y++){const o=y*w;for(let x=0;x<w;x++){let v=255;for(let k=-r;k<=r;k++){const u=a[o+cl(x+k,w)];if(u<v)v=u}t[o+x]=v}}
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){let v=255;for(let k=-r;k<=r;k++){const u=t[cl(y+k,h)*w+x];if(u<v)v=u}a[y*w+x]=v}
+  for(let y=0;y<h;y++){const o=y*w;for(let x=0;x<w;x++)t[o+x]=(a[o+cl(x-1,w)]+2*a[o+x]+a[o+cl(x+1,w)]+2)>>2}
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)a[y*w+x]=(t[cl(y-1,h)*w+x]+2*t[y*w+x]+t[cl(y+1,h)*w+x]+2)>>2;
+  for(let i=0;i<n;i++){let q=(a[i]/255-.2)/.7;q=q<0?0:q>1?1:q;a[i]=q*q*(3-2*q)*255}
+}
+function edgeFill(px,a,w,h){
+  const n=w*h,ok=new Uint8Array(n),rgb=new Uint8Array(n*3),dist=new Uint8Array(n),q=new Int32Array(n);let qh=0,qt=0;
+  const core=i=>a[i]>=250;
+  for(let i=0;i<n;i++){
+    if(!core(i))continue;
+    const x=i%w,y=(i/w)|0;
+    if((x>0&&!core(i-1))||(x<w-1&&!core(i+1))||(y>0&&!core(i-w))||(y<h-1&&!core(i+w))){
+      ok[i]=1;rgb[i*3]=px[i*4];rgb[i*3+1]=px[i*4+1];rgb[i*3+2]=px[i*4+2];q[qt++]=i;
+    }
+  }
+  while(qh<qt){
+    const i=q[qh++],d=dist[i];if(d>=6)continue;
+    const x=i%w,y=(i/w)|0,nb=[x>0?i-1:-1,x<w-1?i+1:-1,y>0?i-w:-1,y<h-1?i+w:-1];
+    for(const j of nb){
+      if(j<0||ok[j]||core(j))continue;
+      ok[j]=1;dist[j]=d+1;rgb[j*3]=rgb[i*3];rgb[j*3+1]=rgb[i*3+1];rgb[j*3+2]=rgb[i*3+2];q[qt++]=j;
+    }
+  }
+  return {rgb,ok,w,h};
+}
+function applyFill(d,W,rows,y0,H,F){
+  const fxs=new Int32Array(W);
+  for(let x=0;x<W;x++)fxs[x]=Math.min(F.w-1,Math.floor((x+.5)*F.w/W));
+  for(let r=0;r<rows;r++){
+    const fy=Math.min(F.h-1,Math.floor((y0+r+.5)*F.h/H)),fo=fy*F.w;
+    for(let x=0;x<W;x++){
+      const p=(r*W+x)*4,al=d[p+3];
+      if(al>0&&al<255){const j=fo+fxs[x];if(F.ok[j]){d[p]=F.rgb[j*3];d[p+1]=F.rgb[j*3+1];d[p+2]=F.rgb[j*3+2]}}
+    }
+  }
+}
+
 /* apply the mask to the full resolution original */
-function buildResult(src,m){
+function buildResult(src,m,F){
   const mc=document.createElement('canvas');mc.width=m.w;mc.height=m.h;
   const mx=mc.getContext('2d'),d=mx.createImageData(m.w,m.h);
   for(let i=0;i<m.a.length;i++)d.data[i*4+3]=m.a[i];
@@ -444,10 +593,22 @@ function buildResult(src,m){
   const x=out.getContext('2d');x.drawImage(src,0,0);
   x.globalCompositeOperation='destination-in';x.imageSmoothingQuality='high';
   x.drawImage(mc,0,0,out.width,out.height);
+  if(F){ /* fix the rim colours in strips, so huge images do not need a huge pixel buffer */
+    x.globalCompositeOperation='source-over';
+    const SH=Math.max(1,Math.floor(4e6/out.width));
+    for(let y=0;y<out.height;y+=SH){
+      const rows=Math.min(SH,out.height-y),id=x.getImageData(0,y,out.width,rows);
+      applyFill(id.data,out.width,rows,y,out.height,F);x.putImageData(id,0,y);
+    }
+  }
   return out;
 }
 
 /* one job at a time */
+function handleFiles(fs){
+  if(working||!views.busy.hidden)return;
+  if(fs.length===1)handle(fs[0]);else runBatch(fs);
+}
 async function handle(f){
   if(working)return;
   working=true;
@@ -464,31 +625,16 @@ async function run(f){
   origUrl=URL.createObjectURL(f);
   const best=$('best').checked,wasReady=ready;
   lastP=0;
-  show('busy');setBusy('Preparing','Loading the background removal engine.',0);
-  engSink=p=>setBusy('Loading engine','Downloading once, then it is cached for next time.',Math.round(p*40));
+  show('busy');
+  setBusy('Getting ready',wasReady?'Starting up.':LOAD_NOTE,0);
+  engSink=p=>setBusy('Loading the tool (first time only)',LOAD_NOTE,Math.round(p*40));
   try{
     const rm=(await getEngine()).removeBackground;
-    const base=wasReady?2:44,span=(90-base)/(best?2:1);
-    setBusy('Removing background','Working on your device. Your image is not uploaded.',base);
-    const work=scaled(src,2048);
-    const m=await getMask(work,rm,prog(base,span,best?'Pass 1 of 2':'Working'));
-    if(best){
-      const m2=await getMask(flipped(work),rm,prog(base+span,span,'Pass 2 of 2'));
-      flipMask(m2);
-      for(let i=0;i<m.a.length;i++)m.a[i]=(m.a[i]+m2.a[i])>>1;
-    }
-    setBusy('Refining edges','Cleaning up the cutout at full resolution.',92);
-    await new Promise(r=>setTimeout(r,30));
-    refine(m.a,m.w,m.h);
-    resCanvas=buildResult(src,m);
+    resCanvas=await cutout(src,rm,best,setBusy,wasReady?2:44,$('clean').checked);
     resBlob=await toBlob(resCanvas);
   }catch(e){
     show('idle');
-    const msg=String(e&&e.message?e.message:e).replace(/\.$/,'');
-    const tail=/connection/i.test(msg)?'Please try again.'
-      :/fetch|network|load|import/i.test(msg)?'Check your connection and try again.'
-      :'Please try again, or try a smaller image.';
-    setErr('Background removal failed: '+msg+'. '+tail);
+    setErr(errInfo(e).full);
     return;
   }
   if(resUrl)URL.revokeObjectURL(resUrl);
@@ -509,6 +655,7 @@ function setBg(c,custom=false){
   fr.classList.toggle('chk',!c);fr.style.background=c||'';
   document.querySelectorAll('.sw[data-bg]').forEach(b=>b.setAttribute('aria-pressed',String(!custom&&b.dataset.bg===c)));
   $('swc').classList.toggle('on',custom);
+  document.querySelectorAll('.cell .frame.res').forEach(f=>{f.classList.toggle('chk',!c);f.style.background=c||''});
 }
 document.querySelectorAll('.sw[data-bg]').forEach(b=>b.onclick=()=>setBg(b.dataset.bg));
 const cu=$('custom');
@@ -516,8 +663,9 @@ cu.oninput=()=>setBg(cu.value,true);
 cu.onclick=()=>setBg(cu.value,true); /* picking the colour that is already showing fires no input event */
 
 /* download: full resolution, lossless PNG by default */
-function saveBlob(b,ext){
-  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=baseName+'-no-bg.'+ext;
+function saveBlob(b,ext){saveFile(b,baseName+'-no-bg.'+ext)}
+function saveFile(b,name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;
   document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
 }
 async function save(type,ext){
@@ -536,7 +684,138 @@ async function save(type,ext){
 $('dlPng').onclick=()=>save('image/png','png');
 $('dlWebp').onclick=()=>save('image/webp','webp');
 $('again').onclick=()=>{setErr('');show('idle')};
+$('bAgain').onclick=()=>{cleanBatch();setErr('');show('idle')};
 try{if(!document.createElement('canvas').toDataURL('image/webp').startsWith('data:image/webp'))$('dlWebp').hidden=true}catch{$('dlWebp').hidden=true}
+if($('dlWebp').hidden)$('bFmt').querySelector('option[value="image/webp"]').remove();
+
+/* bulk: up to 30 images, one after another */
+const MAXN=30;
+let items=[],cancel=false;
+function cleanBatch(){for(const it of items)if(it.url)URL.revokeObjectURL(it.url);items=[];$('grid').textContent=''}
+function cellSet(it,st,msg,title){
+  const c=it.el,fr=c.querySelector('.frame'),se=c.querySelector('.st'),btn=c.querySelector('button');
+  c.className='cell '+st;se.textContent=msg;se.title=title||'';
+  fr.textContent='';fr.style.background='';fr.className='frame';
+  if(st==='done'){
+    const im=new Image();im.src=it.url;im.alt='Background removed from '+it.file.name;fr.append(im);fr.classList.add('res');
+    if(bgColor)fr.style.background=bgColor;else fr.classList.add('chk');
+    btn.hidden=false;
+  }else{
+    btn.hidden=true;
+    if(st==='work'){const sp=document.createElement('div');sp.className='spin';fr.append(sp)}
+    else fr.textContent=st==='fail'?'!':st==='skip'?'\u2013':'\u2026';
+  }
+}
+async function itemOut(it,type){
+  if(!bgColor&&type==='image/png')return it.blob;
+  const bmp=await createImageBitmap(it.blob),c=document.createElement('canvas');
+  c.width=bmp.width;c.height=bmp.height;
+  const x=c.getContext('2d');
+  if(bgColor){x.fillStyle=bgColor;x.fillRect(0,0,c.width,c.height)}
+  x.drawImage(bmp,0,0);if(bmp.close)bmp.close();
+  return toBlob(c,type,1);
+}
+const extOf=b=>b.type==='image/webp'?'webp':'png';
+function runBatch(fs){
+  working=true;cancel=false;setErr('');
+  return batchJob(fs).finally(()=>{working=false});
+}
+async function batchJob(files){
+  cleanBatch();setBg('');
+  const total=files.length,over=total>MAXN;
+  if(over)files=files.slice(0,MAXN);
+  const n=files.length,best=$('best').checked,wasReady=ready,off=wasReady?0:10;
+  items=files.map(f=>{
+    const it={file:f,name:(f.name||'image').replace(/\.[^.]+$/,'')||'image'};
+    const c=document.createElement('div');
+    c.innerHTML='<div class="frame"></div><div class="nm"></div><div class="st"></div><button class="btn ghost sm" type="button" hidden>Download</button>';
+    c.querySelector('.nm').textContent=f.name||'image';c.querySelector('.nm').title=f.name||'image';
+    c.querySelector('button').onclick=async()=>{
+      try{const b=await itemOut(it,$('bFmt').value);saveFile(b,it.name+'-no-bg.'+extOf(b))}
+      catch(e){setErr('Could not create the download: '+(e&&e.message?e.message:e))}
+    };
+    it.el=c;$('grid').append(c);cellSet(it,'wait','Waiting');return it;
+  });
+  const top=(t,note,pct)=>{$('bTitle').textContent=t;$('bNote').textContent=note;$('bFill').style.width=pct+'%'};
+  $('bPriv').textContent='This happens inside your browser, so your images never leave your device. Large batches can take a while, so please keep this tab open.';
+  const w=$('bWarn');w.hidden=!over;
+  w.textContent=over?'You chose '+total+' images, but 30 is the most at once. The first 30 are being processed. When they finish, you can do the rest.':'';
+  $('bCtl').hidden=true;$('bStop').hidden=false;$('bStop').disabled=false;$('bStop').textContent='Stop after this image';
+  show('batch');top('Getting ready',wasReady?'Starting up.':LOAD_NOTE,0);
+  $('tool').scrollIntoView({behavior:'smooth',block:'start'});
+  engSink=p=>top('Loading the tool (first time only)',LOAD_NOTE,Math.round(p*off));
+  let rm;
+  try{rm=(await getEngine()).removeBackground}catch(e){cleanBatch();show('idle');setErr(errInfo(e).full);return}
+  let ok=0,bad=0;
+  for(let i=0;i<n;i++){
+    const it=items[i];
+    if(cancel){for(let j=i;j<n;j++)cellSet(items[j],'skip','Not processed (stopped)');break}
+    cellSet(it,'work','Working on it');
+    const rep=(t,note,p)=>top('Removing backgrounds','Image '+(i+1)+' of '+n+': '+(it.file.name||'image'),Math.round(off+(100-off)*(i+p/100)/n));
+    rep('','',0);
+    try{
+      let src;
+      try{src=await decodeFull(it.file)}catch{throw Object.assign(new Error('decode'),{kind:'decode'})}
+      const out=await cutout(src,rm,best,rep,2,$('clean').checked);
+      it.blob=await toBlob(out);
+      it.url=URL.createObjectURL(await toBlob(scaled(out,360)));
+      cellSet(it,'done','Done');ok++;
+    }catch(e){
+      bad++;
+      if(e&&e.kind==='decode')cellSet(it,'fail','Not a readable image','Your browser could not read this file as an image.');
+      else{const r=errInfo(e);cellSet(it,'fail',r.short,r.full)}
+    }
+    await new Promise(r=>setTimeout(r,20));
+  }
+  const skipped=n-ok-bad;
+  $('bStop').hidden=true;
+  $('bFill').style.width=skipped?$('bFill').style.width:'100%';
+  $('bTitle').textContent=skipped?'Stopped':ok?'All done':'No backgrounds could be removed';
+  $('bNote').textContent=ok+' of '+n+' background'+(n===1?'':'s')+' removed.'+(bad?' '+bad+' could not be processed, see the notes under those images.':'')+(skipped?' '+skipped+' not processed because you stopped.':'');
+  $('bPriv').textContent=ok?'Nothing was uploaded. Everything was done on your device.':'';
+  if(ok){$('bCtl').hidden=false;setBg(bgColor)}
+}
+$('bStop').onclick=()=>{cancel=true;$('bStop').disabled=true;$('bStop').textContent='Stopping after this image...'};
+
+/* a small store-only ZIP writer (PNG and WebP are already compressed) */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u){let c=-1;for(let i=0;i<u.length;i++)c=CRC[(c^u[i])&255]^(c>>>8);return(c^-1)>>>0}
+function zipBlob(files){
+  const enc=new TextEncoder(),parts=[],cd=[],d=new Date();let off=0,cds=0;
+  const time=(d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1),date=((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate();
+  for(const f of files){
+    const nm=enc.encode(f.name),crc=crc32(f.data),sz=f.data.length;
+    const h=new DataView(new ArrayBuffer(30));
+    h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(10,time,true);h.setUint16(12,date,true);
+    h.setUint32(14,crc,true);h.setUint32(18,sz,true);h.setUint32(22,sz,true);h.setUint16(26,nm.length,true);
+    parts.push(h.buffer,nm,f.data);
+    const c=new DataView(new ArrayBuffer(46));
+    c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint16(12,time,true);c.setUint16(14,date,true);
+    c.setUint32(16,crc,true);c.setUint32(20,sz,true);c.setUint32(24,sz,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);
+    cd.push(c.buffer,nm);cds+=46+nm.length;off+=30+nm.length+sz;
+  }
+  const e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cds,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...cd,e.buffer],{type:'application/zip'});
+}
+$('bZip').onclick=async()=>{
+  const btn=$('bZip'),type=$('bFmt').value,list=items.filter(i=>i.blob),files=[],used=new Set();
+  btn.disabled=true;setErr('');
+  try{
+    let k=0;
+    for(const it of list){
+      btn.textContent='Preparing ZIP: '+(++k)+' of '+list.length;
+      const b=await itemOut(it,type),ext=extOf(b);
+      let full=it.name+'-no-bg.'+ext,j=2;
+      while(used.has(full.toLowerCase()))full=it.name+'-no-bg ('+j+++').'+ext;
+      used.add(full.toLowerCase());
+      files.push({name:full,data:new Uint8Array(await b.arrayBuffer())});
+    }
+    saveFile(zipBlob(files),'no-bg-images.zip');
+  }catch(e){setErr('Could not create the ZIP file: '+(e&&e.message?e.message:e))}
+  finally{btn.disabled=false;btn.textContent='Download all (ZIP)'}
+};
+addEventListener('beforeunload',e=>{if(working){e.preventDefault();e.returnValue=''}});
 
 /* start */
 addEventListener('hashchange',route);
