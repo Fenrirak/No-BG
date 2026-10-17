@@ -1178,7 +1178,7 @@ function loadOrt(base,kind){
 async function fetchModel(onp){
   if(location.protocol==='file:')throw enhErr('file');
   let r;
-  try{r=await fetch(MODEL_URL,{cache:'force-cache'})}catch{throw enhErr('model','network')}
+  try{r=await fetch(MODEL_URL,{cache:'force-cache'});if(!r.ok)r=await fetch(MODEL_URL,{cache:'reload'})}catch{throw enhErr('model','network')}
   if(!r.ok||!r.body)throw enhErr('model',String(r.status));
   const total=+r.headers.get('content-length')||4859207,rd=r.body.getReader(),chunks=[];let got=0;
   for(;;){const {done,value}=await rd.read();if(done)break;chunks.push(value);got+=value.length;onp(Math.min(1,got/total))}
