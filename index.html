@@ -67,11 +67,11 @@ a{color:inherit}
 :root[data-theme=light] .theme .moon{display:block}
 
 /* mode tabs + enhancer options */
-.tabs{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:99px;background:var(--panel);margin:20px 0 26px}
+.tabs{display:inline-flex;max-width:100%;gap:4px;padding:4px;border:1px solid var(--line);border-radius:99px;background:var(--panel);margin:20px 0 26px}
 .tabs button{font:600 .95rem var(--sans);padding:10px 22px;border-radius:99px;border:0;background:transparent;color:var(--mute);cursor:pointer;transition:background .15s,color .15s}
 .tabs button:hover{color:var(--text)}
 .tabs button[aria-selected=true]{background:var(--gold);color:var(--ink)}
-@media(max-width:420px){.tabs button{padding:9px 12px;font-size:.84rem;white-space:nowrap}}
+@media(max-width:420px){.tabs{max-width:100%}.tabs button{padding:9px 10px;font-size:.8rem;white-space:nowrap}}
 .eo{display:flex;flex-wrap:wrap;gap:12px 20px;justify-content:center;margin:16px 0 0;color:var(--mute);font-size:.92rem}
 .eo label{display:flex;align-items:center;gap:8px}
 .eo select{background:var(--field);color:var(--text);border:1px solid var(--edge);border-radius:8px;padding:6px 10px;font:inherit}
@@ -196,7 +196,13 @@ footer .brand{font:400 1.9rem var(--serif);color:var(--gold-text)}
 footer nav{display:flex;gap:40px;justify-content:center;margin:18px 0 26px}
 footer nav a{font-weight:600;font-size:1.05rem;text-decoration:none}
 footer nav a:hover{color:var(--gold-text)}
-footer small{color:var(--mute);font-size:.95rem}
+footer small{display:block;max-width:44em;margin:0 auto;color:var(--mute);font-size:.95rem;line-height:1.65;text-wrap:balance}
+footer small a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+footer small a:hover{color:var(--gold-text)}
+@media(max-width:480px){footer nav{gap:10px 24px}}
+#eRetry{display:block;margin:12px auto 0}
+/* keep the page centred in the window even when a scrollbar appears */
+html{scrollbar-gutter:stable both-edges}
 
 /* privacy */
 .doc{padding:clamp(36px,6vw,72px) 0 clamp(48px,8vw,96px);max-width:720px}
@@ -235,7 +241,7 @@ footer nav{flex-wrap:wrap;row-gap:8px}
       <b>No <em>BG</em></b>
     </a>
     <h1 id="h1">Remove Image Background</h1>
-    <p class="sub" id="sub">Drop in a picture and get a clean cutout in seconds. Got a lot? Do up to <strong>30 images at once</strong>. Free, with no signup.</p>
+    <p class="sub" id="sub">Drop in a photo and get a clean no background result in seconds. You can do up to 30 images in one go!</p>
 
     <div class="tabs" role="tablist" aria-label="Choose a tool">
       <button type="button" role="tab" id="tabRemove" aria-selected="true">Remove background</button>
@@ -261,6 +267,7 @@ footer nav{flex-wrap:wrap;row-gap:8px}
           <label>Sharpness <select id="eSharp"><option value="0">Off</option><option value="1">Light</option><option value="2" selected>Crisp</option></select></label>
         </div>
         <p class="warm" id="eNote" hidden></p>
+        <button class="btn ghost sm" id="eRetry" type="button" hidden>Try again</button>
         <p class="warm" id="warm">First time only: the tool loads inside this web page, so your first image takes a little longer. Nothing is installed or saved on your computer.</p>
         <p class="err" id="err" role="alert"></p>
         <input id="file" type="file" accept="image/*" multiple hidden>
@@ -367,7 +374,7 @@ footer nav{flex-wrap:wrap;row-gap:8px}
   <p>To do its work, the page downloads a small amount of code and data from other services:</p>
   <ul>
     <li>The background removal library is loaded from the jsDelivr content delivery network, with esm.sh as a backup.</li>
-    <li>The AI enhancer runs on ONNX Runtime Web, loaded from the jsDelivr content delivery network. The enhancement model itself is a small file served from this site. These are fetched only when you use the AI enhancer, or when you open the Enhance tab or tick the option to also enhance, unless your browser is set to save data or reports a slow or mobile connection, in which case they load when you first use it. Your browser may cache them so later visits are faster.</li>
+    <li>The AI enhancer runs on ONNX Runtime Web, loaded from the jsDelivr content delivery network, with unpkg as a backup. The enhancement model itself is a small file served from this site. These are fetched only when you use the AI enhancer, or when you open the Enhance tab or tick the option to also enhance, unless your browser is set to save data or reports a slow or mobile connection, in which case they load when you first use it. Your browser may cache them so later visits are faster.</li>
     <li>The machine learning model files the library needs are a sizeable download from the IMG.LY content delivery network. To make your first image faster, this starts in the background shortly after the page opens, or as soon as you begin choosing an image. The background start is skipped if your browser is set to save data or reports a slow or mobile connection; in that case the download happens when you first remove a background. Your browser may cache the files so later visits are faster.</li>
   </ul>
   <p>Like any website or file host, these services can see standard technical details of the request, such as your IP address and browser type, under their own privacy policies. They never receive your images.</p>
@@ -439,7 +446,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre></deta
   <h3>Enhancement code</h3>
   <p>The tiling, resizing and sharpening code that surrounds the model was written for No BG and is covered by the same AGPL-3.0 licence as the rest of the site.</p>
   <h3>Model runtime</h3>
-  <p><a href="https://github.com/microsoft/onnxruntime" target="_blank" rel="noopener">ONNX Runtime Web</a> from Microsoft, licensed under the MIT licence, runs the models in your browser. It is bundled with the background removal library above, and is also loaded directly (version 1.20.1, from the jsDelivr content delivery network) for the AI enhancer.</p>
+  <p><a href="https://github.com/microsoft/onnxruntime" target="_blank" rel="noopener">ONNX Runtime Web</a> from Microsoft, licensed under the MIT licence, runs the models in your browser. It is bundled with the background removal library above, and is also loaded directly (version 1.20.1, from the jsDelivr content delivery network, with unpkg as a backup) for the AI enhancer.</p>
 
   <h2>Your images</h2>
   <p>Images you process remain yours. They are handled only on your device, as described in the <a href="#privacy">Privacy Policy</a>.</p>
@@ -456,7 +463,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre></deta
     <a href="#privacy" id="privLink">Privacy Policy</a>
     <a href="#licences">Licences</a>
   </nav>
-  <small>&copy; 2026 No BG, made in New Zealand. Free software under the AGPL-3.0 licence.</small>
+  <small>&copy; 2026 No BG, made in New Zealand. Free software under the AGPL-3.0 licence. Built with open source work from IMG.LY, <span style="white-space:nowrap">Real-ESRGAN</span> and ONNX Runtime. See <a href="#licences">Licences</a> for the credits.</small>
 </footer>
 
 <script>
@@ -1015,11 +1022,12 @@ function runBatch(fs){
 }
 async function batchJob(files){
   const kind=mode,eo=enhOpts(),useEnh=kind==='enhance'||$('enh').checked;
+  eo.ctx={};
   cleanBatch();setBg('');
   const total=files.length,over=total>MAXN;
   if(over)files=files.slice(0,MAXN);
   const n=files.length,best=$('best').checked,clean=$('clean').checked,wasReady=ready;
-  const off=(kind==='remove'?!wasReady:(eo.engine==='ai'&&!sessP&&!aiBroken))?10:0;
+  const off=(kind==='remove'?!wasReady:(eo.engine==='ai'&&!sessP))?10:0;
   const T=kind==='remove'?'Removing backgrounds':'Enhancing images';
   items=files.map(f=>{
     const it={file:f,name:(f.name||'image').replace(/\.[^.]+$/,'')||'image'};
@@ -1046,9 +1054,9 @@ async function batchJob(files){
     engSink=p=>top('Loading the tool (first time only)',LOAD_NOTE,Math.round(p*off));
     try{rm=(await getEngine()).removeBackground}catch(e){cleanBatch();show('idle');setErr(errInfo(e).full);return}
   }
-  if(useEnh&&eo.engine==='ai'&&!aiBroken&&!sessP){
+  if(useEnh&&eo.engine==='ai'&&!sessP){
     enhSink=p=>top('Loading the AI enhancer (first time only)',ENH_NOTE,Math.round(p*off));
-    try{await getSession()}catch{aiBroken=true}
+    try{await getSession()}catch(e){enhFail=enhReason(e);eo.ctx.noAI='The AI enhancer could not load ('+enhFail+'), so Fast mode was used.'}
   }
   let ok=0,bad=0;const notes=new Set();
   for(let i=0;i<n;i++){
@@ -1135,8 +1143,8 @@ applyTheme(root.dataset.theme==='light'?'light':'dark',false);
 try{matchMedia('(prefers-color-scheme: light)').addEventListener('change',e=>{let v;try{v=localStorage.getItem('nobg-theme')}catch{}if(!v)applyTheme(e.matches?'light':'dark',false)})}catch{}
 
 /* ===== enhancer: modes, engine loading and flows ===== */
-let mode='remove',forceWasm=false,aiBroken=false,enhReady=false,ortP=null,sessP=null,enhSink=null;
-const ORT_BASE='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/';
+let mode='remove',forceWasm=false,enhFail='',enhReady=false,sessP=null,enhSink=null;
+const ORT_BASES=['https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/','https://unpkg.com/onnxruntime-web@1.20.1/dist/'];
 const MODEL_URL=new URL('models/realesr-general-x4v3-mix.onnx',document.baseURI).href;
 const HAS_GPU=!!navigator.gpu;
 /* only trust WebGPU when it is a real graphics chip; some computers offer a very slow software stand-in */
@@ -1144,48 +1152,66 @@ let gpuOK=false;
 const gpuCheck=HAS_GPU?Promise.race([navigator.gpu.requestAdapter().then(a=>{const fb=a&&(a.isFallbackAdapter||(a.info&&a.info.isFallbackAdapter));gpuOK=!!a&&!fb}),new Promise(r=>setTimeout(r,3000))]).catch(()=>{}):Promise.resolve();
 const LOWMEM=IOS||(navigator.deviceMemory&&navigator.deviceMemory<4);
 const ENH_NOTE='This only happens the first time. The AI enhancer (about 10 MB) simply loads inside this web page. Nothing is installed or saved to your computer, and your browser may keep a temporary copy so later visits are quicker.';
-const SUB_REMOVE='Drop in a picture and get a clean cutout in seconds. Got a lot? Do up to <strong>30 images at once</strong>. Free, with no signup.';
-const SUB_ENH='Make photos sharper and bigger, with real detail brought back by AI. Do up to <strong>30 images at once</strong>. Free, with no signup.';
+const SUB_REMOVE='Drop in a photo and get a clean no background result in seconds. You can do up to 30 images in one go!';
+const SUB_ENH='Make images sharper and more clear with No BG\'s image enhancer. Up to 30 images at once.';
 const epParams=ep=>ep==='webgpu'?{TS:256,OV:32}:{TS:128,OV:24};
 const enhOpts=()=>({scale:+$('eScale').value,engine:$('eEng').value,sharp:+$('eSharp').value});
-const enhErr=()=>Object.assign(new Error('enhancer could not load'),{kind:'enhload'});
-
-function loadOrt(){
-  if(!ortP)ortP=gpuCheck.then(()=>import(ORT_BASE+(gpuOK?'ort.webgpu.min.mjs':'ort.wasm.min.mjs'))).then(m=>{
+const enhErr=(stage,detail)=>Object.assign(new Error('enhancer '+stage+(detail?' ('+detail+')':'')),{kind:'enhload',stage,detail});
+const enhReason=e=>{
+  const st=e&&e.stage;
+  if(st==='file')return 'this page was opened as a file on your computer, so it cannot read the AI model. Open the website from its web address instead';
+  if(st==='model'&&e.detail==='404')return 'the AI model file was not found on the website';
+  if(st==='model')return 'the AI model file could not be downloaded';
+  return 'your browser could not start the AI engine, which can happen if an ad blocker or network filter blocks it';
+};
+const ortCache={};
+function loadOrt(base,kind){
+  const key=base+kind;
+  if(!ortCache[key])ortCache[key]=import(base+(kind==='gpu'?'ort.webgpu.min.mjs':'ort.wasm.min.mjs')).then(m=>{
     const o=m.InferenceSession?m:m.default;
-    o.env.wasm.wasmPaths=ORT_BASE;
+    o.env.wasm.wasmPaths=base;
     o.env.wasm.numThreads=self.crossOriginIsolated?Math.min(4,navigator.hardwareConcurrency||2):1;
     return o;
-  }).catch(()=>{ortP=null;throw enhErr()});
-  return ortP;
+  }).catch(e=>{delete ortCache[key];throw e});
+  return ortCache[key];
 }
 async function fetchModel(onp){
-  const r=await fetch(MODEL_URL,{cache:'force-cache'});
-  if(!r.ok||!r.body)throw enhErr();
+  if(location.protocol==='file:')throw enhErr('file');
+  let r;
+  try{r=await fetch(MODEL_URL,{cache:'force-cache'})}catch{throw enhErr('model','network')}
+  if(!r.ok||!r.body)throw enhErr('model',String(r.status));
   const total=+r.headers.get('content-length')||4859207,rd=r.body.getReader(),chunks=[];let got=0;
   for(;;){const {done,value}=await rd.read();if(done)break;chunks.push(value);got+=value.length;onp(Math.min(1,got/total))}
   const buf=new Uint8Array(got);let o=0;for(const c of chunks){buf.set(c,o);o+=c.length}
   return buf;
 }
+/* tries the graphics chip first (if it is a real one), then the processor, then the same again from the backup host */
+async function openSession(model){
+  const kinds=gpuOK&&!forceWasm?['gpu','cpu']:['cpu'];let last=null;
+  for(const base of ORT_BASES)for(const kind of kinds){
+    try{
+      const ort=await loadOrt(base,kind),ep=kind==='gpu'?'webgpu':'wasm';
+      return{ort,ep,s:await ort.InferenceSession.create(model,{executionProviders:[ep],graphOptimizationLevel:'all'})};
+    }catch(e){last=e}
+  }
+  throw Object.assign(enhErr('engine'),{cause:last});
+}
 function getSession(){
   if(!sessP)sessP=(async()=>{
-    const ort=await loadOrt(),model=await fetchModel(f=>{if(enhSink)enhSink(f)});
-    for(const ep of(gpuOK&&!forceWasm?['webgpu','wasm']:['wasm'])){
-      try{return{ort,ep,s:await ort.InferenceSession.create(model,{executionProviders:[ep],graphOptimizationLevel:'all'})}}catch{}
-    }
-    throw enhErr();
-  })().catch(e=>{sessP=null;throw e});
+    await gpuCheck;
+    return openSession(await fetchModel(f=>{if(enhSink)enhSink(f)}));
+  })().catch(e=>{sessP=null;console.error('No BG: the AI enhancer could not start.',e&&e.message,e&&e.cause);throw e});
   return sessP;
 }
 function enhPlan(w,h,o){
-  const notes=[],cap=LOWMEM?12e6:30e6;let scale=o.scale,engine=o.engine;
+  const ctx=o.ctx||{},notes=[],cap=LOWMEM?12e6:30e6;let scale=o.scale,engine=o.engine;
   if(w*h*scale*scale>cap){
     if(scale===4&&w*h*4<=cap){scale=2;notes.push('Enlarged 2\u00d7 instead of 4\u00d7, so your device does not run out of memory.')}
     else{scale=1;notes.push('This image is already very large, so it was sharpened at its current size instead of being enlarged.')}
   }
   if(scale===1)engine='fast';
   if(engine==='ai'){
-    if(aiBroken){engine='fast';notes.push('The AI enhancer could not load, so Fast mode was used.')}
+    if(ctx.noAI){engine='fast';notes.push(ctx.noAI)}
     else{const lim=gpuOK&&!forceWasm?10e6:1.2e6;if(w*h>lim){engine='fast';notes.push('This image is too large for AI mode on this device (the limit is about '+(lim/1e6)+' megapixels), so Fast mode was used.')}}
   }
   return{scale,engine,notes};
@@ -1193,7 +1219,7 @@ function enhPlan(w,h,o){
 const fmtEta=s=>s<75?'about '+Math.max(5,Math.round(s/5)*5)+' seconds left':'about '+Math.round(s/60)+' minutes left';
 async function enhanceCanvas(src,o,report){
   await gpuCheck;
-  const w=src.width,h=src.height,pl=enhPlan(w,h,o),notes=pl.notes.slice(),rgba=src.getContext('2d').getImageData(0,0,w,h).data,t0=Date.now();
+  const ctx=o.ctx||{},w=src.width,h=src.height,pl=enhPlan(w,h,o),notes=pl.notes.slice(),rgba=src.getContext('2d').getImageData(0,0,w,h).data,t0=Date.now();
   let res=null,engine=pl.engine;
   const prog=async(d,t)=>{
     const eta=d>=2&&d<t?', '+fmtEta((Date.now()-t0)/1000/d*(t-d)):'';
@@ -1204,13 +1230,13 @@ async function enhanceCanvas(src,o,report){
     try{
       const hd=await getSession(),{TS,OV}=epParams(hd.ep);
       const run=async inp=>(await hd.s.run({input:new hd.ort.Tensor('float32',inp,[1,3,TS,TS])})).output.data;
-      res=await enhanceRGBA(rgba,w,h,{scale:pl.scale,engine:'ai',sharp:o.sharp,TS,OV},run,prog);
+      res=await enhanceRGBA(rgba,w,h,{scale:pl.scale,engine:'ai',sharp:o.sharp,TS,OV},run,prog);enhFail='';
     }catch(e){
-      if(e&&e.kind==='enhload'){aiBroken=true;engine='fast';notes.push('The AI enhancer could not load, so Fast mode was used.')}
+      if(e&&e.kind==='enhload'){enhFail=enhReason(e);ctx.noAI='The AI enhancer could not load ('+enhFail+'), so Fast mode was used.';engine='fast';notes.push(ctx.noAI);refreshEnhNote()}
       else if(gpuOK&&!forceWasm){ /* trouble with the graphics chip: try the slower processor route */
         forceWasm=true;sessP=null;
         if(w*h>1.2e6){engine='fast';notes.push('Your graphics chip could not run the AI enhancer, and this image is too large for the slower backup, so Fast mode was used.')}
-      }else{aiBroken=true;engine='fast';notes.push('The AI enhancer ran into a problem, so Fast mode was used.')}
+      }else{console.error('No BG: the AI enhancer failed.',e);ctx.noAI='The AI enhancer ran into a problem, so Fast mode was used.';engine='fast';notes.push(ctx.noAI)}
     }
   }
   if(!res){
@@ -1276,16 +1302,17 @@ cmpBox.addEventListener('pointermove',e=>{if(zoomed||dragging)cmpMove(e)});
 /* modes, options and the quiet background load */
 function refreshEnhNote(){
   const ai=$('eEng').value==='ai';
+  $('eRetry').hidden=!(ai&&enhFail);
   $('eNote').textContent=!ai?'Fast mode needs no download and is instant. It gives clean, sharp results, while AI mode brings back more real detail.'
-    :aiBroken?'The AI enhancer could not load, so Fast mode will be used. Check your connection and reload the page to try again.'
+    :enhFail?'The AI enhancer could not load ('+enhFail+'), so Fast mode will be used.'
     :enhReady?'The AI enhancer is ready.'
     :'AI mode loads about 10 MB once, inside this web page. Nothing is installed or saved on your computer. '+(gpuOK?'Your device can use its graphics chip, so most images take seconds.':'Your device cannot use its graphics chip for this, so larger images are slow. Fast mode is instant.');
 }
-function warmEnh(){
-  if(sessP||aiBroken||!canWarm())return;
+function warmEnh(force){
+  if(sessP||(!force&&(enhFail||!canWarm())))return;
   enhSink=p=>{$('eNote').textContent='Loading the AI enhancer (first time only): '+Math.round(p*100)+'%. Nothing is installed or saved on your computer.'};
-  $('eNote').textContent='Loading the AI enhancer (first time only). Nothing is installed or saved on your computer.';
-  getSession().then(()=>{enhReady=true;refreshEnhNote()},()=>{aiBroken=true;refreshEnhNote()});
+  $('eNote').textContent='Loading the AI enhancer (first time only). Nothing is installed or saved on your computer.';$('eRetry').hidden=true;
+  getSession().then(()=>{enhReady=true;enhFail='';refreshEnhNote()},e=>{enhFail=enhReason(e);refreshEnhNote()});
 }
 function updateEnhVis(){
   const on=mode==='enhance'||$('enh').checked;
@@ -1302,6 +1329,7 @@ function applyMode(m){
 }
 for(const [id,m] of [['tabRemove','remove'],['tabEnhance','enhance']])$(id).onclick=()=>{if(working||m===mode)return;cleanBatch();setErr('');show('idle');applyMode(m)};
 $('enh').onchange=updateEnhVis;
+$('eRetry').onclick=()=>{enhFail='';sessP=null;enhReady=false;forceWasm=false;warmEnh(true)};
 $('eEng').onchange=()=>{refreshEnhNote();if($('eEng').value==='ai')warmEnh()};
 gpuCheck.then(()=>{if(!$('eo').hidden)refreshEnhNote()});
 if(location.hash==='#enhance')applyMode('enhance');
